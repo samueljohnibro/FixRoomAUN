@@ -83,7 +83,7 @@
             return;
         }
 
-        const allowedStatuses = ["Pending", "In Progress", "Completed", "Closed", "Cancelled"];
+        const allowedStatuses = ["Pending", "In Progress", "Completed", "Cancelled"];
 
         tickets.forEach(ticket => {
             const card = document.createElement("div");

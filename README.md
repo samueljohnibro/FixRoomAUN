@@ -235,4 +235,4 @@ Student and staff dashboards now include a shared Home / Analytics navigation. S
 
 ### Ticket status lifecycle
 
-The shared demo store treats `Pending`, `In Progress`, `Completed`, `Closed`, and `Cancelled` as distinct persisted states. When a student gives positive feedback after staff marks a ticket `Completed`, the ticket becomes `Closed`. The staff page reads that same persisted value and exposes `Closed` in both the ticket dropdown and the status filter, so a fresh staff login/reload does not visually fall back to `Pending`.
+The shared demo store keeps the staff workflow status at `Completed` after staff finishes a request. When the student gives positive feedback, the student dashboard displays the request as `Closed`, while the underlying staff status remains `Completed`. `Closed` is therefore a student-facing confirmation state rather than a staff status-update option. The staff dashboard continues to display the request under `Completed` after a fresh login or reload.

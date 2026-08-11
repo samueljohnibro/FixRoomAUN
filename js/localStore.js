@@ -532,7 +532,16 @@ function getAllTickets(status = "all") {
             dorm: normalizeDormName(ticket.dorm, ticket.student_email) || ticket.dorm || "Unassigned"
         }))
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    return status === "all" ? tickets : tickets.filter(ticket => ticket.status === status);
+
+    if (status === "all") return tickets;
+    if (status === "Closed") {
+        return tickets.filter(ticket =>
+            ticket.status === "Completed" &&
+            ticket.feedback === "positive" &&
+            ticket.feedback_given === true
+        );
+    }
+    return tickets.filter(ticket => ticket.status === status);
 }
 
 function createTicket({ studentEmail, category, description, imageUrl = null }) {
@@ -588,6 +597,13 @@ function updateTicket(id, updates) {
     const state = readState();
     const ticket = state.tickets.find(item => item.id === id);
     if (!ticket) return { ticket: null, error: "Ticket not found." };
+
+    // Closed is a student-facing state derived from positive feedback.
+    // Staff workflow status remains Completed, so staff can continue to
+    // manage and view the request under Completed.
+    if (updates && updates.status === "Closed" && (updates.feedback || ticket.feedback) !== "positive") {
+        return { ticket: null, error: "A ticket can only be closed after positive student feedback." };
+    }
 
     // Every time staff marks a request Completed, the student receives a
     // completely fresh feedback opportunity. This is intentionally reset on

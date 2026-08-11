@@ -1,3 +1,18 @@
+# Final Status Workflow Correction
+
+- Positive student feedback no longer changes the persisted ticket status to `Closed`.
+- The staff workflow status remains `Completed` after a thumbs-up.
+- The student dashboard displays `Closed` as a derived confirmation state after thumbs-up.
+- Negative feedback continues to reopen the ticket as `Pending`.
+- Staff can still filter `Closed` as a feedback-derived view, while the actual staff status remains `Completed`.
+
+# Final Status Workflow Update
+
+- Removed `Closed` from the staff ticket status-update dropdown.
+- Kept `Closed` available in the staff status filter so completed/confirmed tickets remain searchable.
+- Added a data-layer safeguard that rejects attempts to close a ticket unless positive student feedback (`thumbs up`) is present.
+- Preserved the existing student feedback flow: staff marks a ticket `Completed`, the student provides thumbs-up/thumbs-down feedback, and only thumbs-up closes the ticket.
+
 
 ## v5 — Feedback cycle + quick account switching
 

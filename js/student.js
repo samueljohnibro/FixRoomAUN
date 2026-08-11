@@ -360,14 +360,19 @@
         }
 
         tickets.forEach(ticket => {
-            const status = ticket.status;
+            // Positive student feedback closes the request from the student's
+            // perspective, while the persisted staff workflow status remains
+            // Completed so staff can continue to see it under Completed.
+            const studentClosed = ticket.status === "Completed" && ticket.feedback === "positive" && ticket.feedback_given === true;
+            const status = studentClosed ? "Closed" : ticket.status;
             let actionSection =
                 `<span class="ticket-status status-${status.toLowerCase().replace(/\s+/g, "-")}">${escapeHtml(status)}</span>`;
 
             if (status === "Pending") {
                 actionSection += `<button type="button" class="cancel-btn" data-id="${escapeHtml(ticket.id)}">Cancel</button>`;
-            } else if (status === "Completed") {
-                actionSection +=
+            } else if (ticket.status === "Completed" && !ticket.feedback_given) {
+                actionSection =
+                    `<span class="ticket-status status-completed">Completed</span>` +
                     `<div class="inline-feedback"><button type="button" class="thumb-inline" data-id="${escapeHtml(ticket.id)}" data-type="positive">👍</button><button type="button" class="thumb-inline" data-id="${escapeHtml(ticket.id)}" data-type="negative">👎</button></div>`;
             } else if (status === "Cancelled") {
                 actionSection += `<button type="button" class="delete-btn" data-id="${escapeHtml(ticket.id)}">Delete</button>`;
@@ -419,8 +424,7 @@
                 if (button.dataset.type === "positive") {
                     const result = updateTicket(button.dataset.id, {
                         feedback: "positive",
-                        feedback_given: true,
-                        status: "Closed"
+                        feedback_given: true
                     });
                     if (result.error) alert(result.error);
                     loadTickets();
