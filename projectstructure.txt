@@ -1,0 +1,20 @@
+fixroomaun/
+    index.html
+    dashboard.html
+    staff.html
+    analytics.html
+    admin.html
+    README.md
+    CHANGELOG.md
+    .gitignore
+    start-demo.bat
+    assets/
+    css/
+        styles.css
+    js/
+        localStore.js
+        auth-standalone.js
+        student.js
+        staff.js
+        analytics.js
+        supabase.js  (historical/reference only)

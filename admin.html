@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixRoomAUN - Administration</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
+</head>
+<body>
+<header class="dashboard-header">
+    <div class="header-left"><img src="assets/fixroomaunlogowtext.png" alt="FixRoomAUN Logo"></div>
+    <nav class="dashboard-nav" aria-label="Primary navigation">
+        <a class="nav-tab" href="staff.html">Home</a>
+        <a class="nav-tab" href="analytics.html">Analytics</a>
+    </nav>
+
+    <div class="header-right"><span id="analyticsEmail"></span><button id="logoutBtn" class="secondary-btn">Logout</button></div>
+</header>
+<main class="dashboard-container analytics-page">
+    <div class="page-heading"><div><span class="eyebrow">System Administration</span><h1>Administrator Dashboard</h1><p>High-level view of maintenance operations for the demo organization.</p></div><button id="resetDemoBtn" class="secondary-btn">Reset Demo Data</button></div>
+    <section class="analytics-grid">
+        <article class="analytics-card"><span>Total Requests</span><strong id="totalRequests">0</strong></article>
+        <article class="analytics-card"><span>Pending</span><strong id="pending">0</strong></article>
+        <article class="analytics-card"><span>In Progress</span><strong id="inProgress">0</strong></article>
+        <article class="analytics-card"><span>Completed</span><strong id="completed">0</strong></article>
+        <article class="analytics-card"><span>Cancelled</span><strong id="cancelled">0</strong></article>
+        <article class="analytics-card"><span>Closed</span><strong id="closed">0</strong></article>
+    </section>
+    <section class="analytics-columns">
+        <article class="analytics-panel"><h2>Requests by Category</h2><ul id="categoryList" class="analytics-list"></ul></article>
+        <article class="analytics-panel"><h2>Requests by Dorm</h2><ul id="dormList" class="analytics-list"></ul></article>
+    </section>
+</main>
+<script src="js/localStore.js"></script>
+<script src="js/analytics.js"></script>
+</body>
+</html>

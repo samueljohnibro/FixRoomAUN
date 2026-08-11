@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixRoomAUN - Maintenance Staff</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
+</head>
+<body>
+
+<header class="dashboard-header">
+
+    <div class="header-left">
+        <img src="assets/fixroomaunlogowtext.png" alt="FixRoomAUN Logo">
+    </div>
+
+    <nav class="dashboard-nav" aria-label="Primary navigation">
+        <a class="nav-tab active" href="staff.html" aria-current="page">Home</a>
+        <a class="nav-tab" href="analytics.html">Analytics</a>
+    </nav>
+
+    <div class="header-right">
+        <span id="staffEmail"></span>
+        <button id="logoutBtn" class="secondary-btn" type="button">Logout</button>
+    </div>
+
+</header>
+
+<div class="dashboard-container">
+
+    <h2>Maintenance Requests</h2>
+
+    <!-- FILTER -->
+    <select id="statusFilter" style="margin-bottom:20px;">
+        <option value="all">All Tickets</option>
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+        <option value="Closed">Closed</option>
+        <option value="Cancelled">Cancelled</option>
+    </select>
+
+    <div id="staffTicketList" class="ticket-list"></div>
+
+</div>
+
+<script src="js/localStore.js"></script>
+<script src="js/staff.js"></script>
+
+</body>
+</html>

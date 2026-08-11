@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixRoomAUN</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
+</head>
+<body>
+<div class="login-container">
+    <img src="assets/fixroomaunlogowtext.png" alt="FixRoomAUN Logo" class="login-logo">
+
+    <div id="loginSection">
+        <h2>Login</h2>
+        <form id="loginForm" method="post" action="/__login" autocomplete="on">
+            <input type="email" id="loginEmail" name="email" placeholder="Enter your email address" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required>
+            <div class="password-wrapper">
+                <input type="password" id="loginPassword" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Show password" aria-pressed="false">👁</button>
+            </div>
+            <label for="loginRole">Account type</label>
+            <select id="loginRole" name="role" required>
+                <option value="student">Student</option>
+                <option value="staff">Staff</option>
+            </select>
+            <button type="submit">Login</button>
+        </form>
+
+        <section class="recent-accounts-section" aria-labelledby="recentAccountsHeading">
+            <div class="recent-accounts-heading">
+                <h3 id="recentAccountsHeading">Previously logged in accounts</h3>
+                <p>Select an account to quickly switch back to it.</p>
+            </div>
+            <div id="recentAccounts" class="recent-accounts" aria-live="polite"></div>
+        </section>
+
+        <p id="loginMessage" class="demo-hint" role="alert" aria-live="polite" hidden></p>
+        <p class="demo-hint"><strong>Demo:</strong> demo.student@aun.edu.ng / Demo123!</p>
+        <p class="demo-hint">For a first-time demo account, use any valid email address and password. No email verification is required.</p>
+    </div>
+</div>
+<script src="js/localStore.js"></script>
+<script src="js/auth-standalone.js"></script>
+</body>
+</html>

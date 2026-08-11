@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixRoomAUN - Analytics</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
+</head>
+<body>
+<header class="dashboard-header">
+    <div class="header-left"><img src="assets/fixroomaunlogowtext.png" alt="FixRoomAUN Logo"></div>
+    <nav class="dashboard-nav" aria-label="Primary navigation">
+        <a id="homeLink" class="nav-tab" href="dashboard.html">Home</a>
+        <a class="nav-tab active" href="analytics.html" aria-current="page">Analytics</a>
+    </nav>
+    <div class="header-right">
+        <span id="analyticsEmail"></span>
+        <button id="logoutBtn" class="secondary-btn" type="button">Logout</button>
+    </div>
+</header>
+
+<main class="dashboard-container analytics-page">
+    <div class="page-heading">
+        <div>
+            <span id="analyticsRoleLabel" class="eyebrow">Maintenance Analytics</span>
+            <h1 id="analyticsHeading">Analytics</h1>
+            <p id="analyticsSubtitle">A live overview of maintenance activity.</p>
+        </div>
+    </div>
+
+    <section class="analytics-grid" aria-label="Key metrics">
+        <article class="analytics-card"><span>Total Requests</span><strong id="totalRequests">0</strong></article>
+        <article class="analytics-card"><span>Pending</span><strong id="pending">0</strong></article>
+        <article class="analytics-card"><span>In Progress</span><strong id="inProgress">0</strong></article>
+        <article class="analytics-card"><span>Completed</span><strong id="completed">0</strong></article>
+        <article class="analytics-card"><span>Reopened</span><strong id="reopened">0</strong></article>
+        <article class="analytics-card"><span>Completion Rate</span><strong id="completionRate">0%</strong></article>
+    </section>
+
+    <section class="analytics-columns">
+        <article class="analytics-panel">
+            <div class="analytics-panel-heading"><div><span class="eyebrow">Breakdown</span><h2 id="categoryTitle">Requests by Category</h2></div></div>
+            <ul id="categoryList" class="analytics-list"></ul>
+        </article>
+        <article class="analytics-panel">
+            <div class="analytics-panel-heading"><div><span class="eyebrow">Housing</span><h2 id="dormTitle">Requests by Dorm</h2></div></div>
+            <ul id="dormList" class="analytics-list"></ul>
+        </article>
+    </section>
+
+    <section class="analytics-columns analytics-secondary">
+        <article class="analytics-panel compact-metrics">
+            <span class="eyebrow">Service Outcome</span>
+            <h2>Resolution Overview</h2>
+            <div class="metric-row"><span>Average resolution time</span><strong id="resolutionMetric">—</strong></div>
+            <div class="metric-row"><span>Student feedback</span><strong id="feedbackMetric">0 👍 / 0 👎</strong></div>
+        </article>
+        <article class="analytics-panel">
+            <span class="eyebrow">Latest</span>
+            <h2>Recent Activity</h2>
+            <ul id="recentActivity" class="recent-activity"></ul>
+        </article>
+    </section>
+</main>
+<script src="js/localStore.js"></script>
+<script src="js/analytics.js"></script>
+</body>
+</html>

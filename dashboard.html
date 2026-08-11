@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixRoomAUN Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
+</head>
+<body>
+
+<!-- ===================================================== -->
+<!-- ================= DASHBOARD HEADER ================== -->
+<!-- ===================================================== -->
+
+<header class="dashboard-header">
+
+    <div class="header-left">
+        <img src="assets/fixroomaunlogowtext.png" alt="FixRoomAUN Logo">
+    </div>
+
+    <nav class="dashboard-nav" aria-label="Primary navigation">
+        <a class="nav-tab active" href="dashboard.html" aria-current="page">Home</a>
+        <a class="nav-tab" href="analytics.html">Analytics</a>
+    </nav>
+
+    <div class="header-right">
+
+        <div class="user-info-container">
+            <span id="studentEmail"></span>
+
+            <div class="user-popup">
+                <p class="profile-heading">Demo Student Profile</p>
+                <p><strong>Name:</strong> <span id="popupName"></span></p>
+                <p><strong>Student ID:</strong> <span id="popupStudentId"></span></p>
+                <p><strong>Email:</strong> <span id="popupEmail"></span></p>
+                <p><strong>Dorm:</strong> <span id="popupDorm"></span></p>
+                <p><strong>Room:</strong> <span id="popupRoom"></span></p>
+                <p><strong>Floor:</strong> <span id="popupFloor"></span></p>
+                <p><strong>Room Type:</strong> <span id="popupType"></span></p>
+                <p><strong>Housing Status:</strong> <span id="popupHousingStatus"></span></p>
+                <p class="profile-note">Housing details are generated for this portfolio demo.</p>
+            </div>
+        </div>
+
+        <button id="logoutBtn" class="secondary-btn" type="button">Logout</button>
+
+    </div>
+
+</header>
+
+<!-- ===================================================== -->
+<!-- ================= MAIN CONTENT ====================== -->
+<!-- ===================================================== -->
+
+<div class="dashboard-container">
+
+    <h2>Select Item to Report</h2>
+
+    <div class="grid">
+        <div class="grid-item" role="button" tabindex="0" data-item="Air Conditioner" data-image="assets/ac.png">
+            <img src="assets/ac.png" alt="Air Conditioner">
+            <p>Air Conditioner</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Power Socket" data-image="assets/socket.png">
+            <img src="assets/socket.png" alt="Power Socket">
+            <p>Power Socket</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Ceiling Light" data-image="assets/ceilinglight.png">
+            <img src="assets/ceilinglight.png" alt="Ceiling Light">
+            <p>Ceiling Light</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Side Reading Light" data-image="assets/sidelight.png">
+            <img src="assets/sidelight.png" alt="Side Reading Light">
+            <p>Side Reading Light</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Bed" data-image="assets/bed.png">
+            <img src="assets/bed.png" alt="Bed">
+            <p>Bed</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Wardrobe" data-image="assets/wardrobe.png">
+            <img src="assets/wardrobe.png" alt="Wardrobe">
+            <p>Wardrobe</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Door" data-image="assets/door.png">
+            <img src="assets/door.png" alt="Door">
+            <p>Door</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Window" data-image="assets/window.png">
+            <img src="assets/window.png" alt="Window">
+            <p>Window</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Toilet" data-image="assets/toilet.png">
+            <img src="assets/toilet.png" alt="Toilet">
+            <p>Toilet</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Bathtub" data-image="assets/bathtub.png">
+            <img src="assets/bathtub.png" alt="Bathtub">
+            <p>Bathtub</p>
+        </div>
+
+        <div class="grid-item" role="button" tabindex="0" data-item="Wash Hand Basin" data-image="assets/basin.png">
+            <img src="assets/basin.png" alt="Wash Hand Basin">
+            <p>Wash Hand Basin</p>
+        </div>
+    </div>
+
+    <hr style="margin:60px 0; opacity:0.2;">
+
+    <h2>My Tickets</h2>
+    <div id="ticketList" class="ticket-list"></div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- ================= REPORT MODAL ====================== -->
+<!-- ===================================================== -->
+
+<div id="reportModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+
+        <div class="modal-item-preview">
+            <img id="modalItemImage" src="assets/ac.png" alt="Selected item">
+            <div>
+                <h3 id="modalTitle">Report Issue</h3>
+                <p>Tell maintenance what needs attention.</p>
+            </div>
+        </div>
+
+        <textarea id="issueDescription" placeholder="Describe the issue..."></textarea>
+
+        <div style="margin-top:15px;">
+            <label>Attach Image (Optional)</label>
+            <input type="file" id="issueImage" accept="image/*" capture="environment">
+            <img id="imagePreview" style="display:none; margin-top:10px; max-width:100%; border-radius:8px;">
+        </div>
+
+        <div class="modal-buttons" style="margin-top:20px;">
+            <button id="submitIssue" type="button">Report</button>
+            <button id="closeModal" type="button" class="secondary-btn">Cancel</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- ================= CONFIRM MODAL ===================== -->
+<!-- ===================================================== -->
+
+<div id="confirmModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+
+        <h3 id="confirmMessage">Are you sure?</h3>
+
+        <div class="modal-buttons" style="margin-top:20px;">
+            <button id="confirmYes" type="button">Yes</button>
+            <button id="confirmNo" type="button" class="secondary-btn">Cancel</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- ============ NEGATIVE FEEDBACK MODAL =============== -->
+<!-- ===================================================== -->
+
+<div id="negativeModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+
+        <h3>Tell us what is still wrong</h3>
+        <p class="feedback-help">Your previous issue description is pre-filled below. Edit it if needed, then send the request again.</p>
+
+        <textarea id="negativeDescription" aria-label="Issue description for reopening the ticket"></textarea>
+
+        <div class="modal-buttons" style="margin-top:20px;">
+            <button id="submitNegative" type="button">Reopen Ticket</button>
+            <button id="cancelNegative" type="button" class="secondary-btn">Cancel</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- ================= SCRIPT ============================= -->
+<!-- ===================================================== -->
+
+<script src="js/localStore.js"></script>
+<script src="js/student.js"></script>
+
+</body>
+</html>
