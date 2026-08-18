@@ -3,45 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary SEO -->
     <title>FixRoomAUN</title>
+
+    <meta
+        name="description"
+        content="FixRoomAUN — A platform for managing accommodation and room-related services at AUN."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
+    <meta
+        name="theme-color"
+        content="#080a0f"
+    >
+
+    <!-- Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="assets/fixroomaunlogo.png"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="assets/fixroomaunlogo.png"
+    >
+
+    <!-- Open Graph / WhatsApp / Facebook / LinkedIn -->
+    <meta
+        property="og:type"
+        content="website"
+    >
+
+    <meta
+        property="og:url"
+        content="https://fixroom-aun.netlify.app/"
+    >
+
+    <meta
+        property="og:title"
+        content="FixRoomAUN"
+    >
+
+    <meta
+        property="og:description"
+        content="FixRoomAUN — A platform for managing accommodation and room-related services at AUN."
+    >
+
+    <meta
+        property="og:site_name"
+        content="FixRoomAUN"
+    >
+
+    <meta
+        property="og:image"
+        content="https://fixroom-aun.netlify.app/assets/fixroomaunlogowtext.png"
+    >
+
+    <meta
+        property="og:image:alt"
+        content="FixRoomAUN Logo"
+    >
+
+    <meta
+        property="og:image:type"
+        content="image/png"
+    >
+
+    <!-- X / Twitter -->
+    <meta
+        name="twitter:card"
+        content="summary_large_image"
+    >
+
+    <meta
+        name="twitter:title"
+        content="FixRoomAUN"
+    >
+
+    <meta
+        name="twitter:description"
+        content="FixRoomAUN — A platform for managing accommodation and room-related services at AUN."
+    >
+
+    <meta
+        name="twitter:image"
+        content="https://fixroom-aun.netlify.app/assets/fixroomaunlogowtext.png"
+    >
+
+    <meta
+        name="twitter:image:alt"
+        content="FixRoomAUN Logo"
+    >
+
+    <!-- Application Styles -->
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
 </head>
+
 <body>
+
 <div class="login-container">
-    <img src="assets/fixroomaunlogowtext.png" alt="FixRoomAUN Logo" class="login-logo">
+
+    <img
+        src="assets/fixroomaunlogowtext.png"
+        alt="FixRoomAUN Logo"
+        class="login-logo"
+    >
 
     <div id="loginSection">
+
         <h2>Login</h2>
+
         <form id="loginForm" autocomplete="on">
-            <input type="email" id="loginEmail" name="email" placeholder="Enter your email address" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required>
+
+            <input
+                type="email"
+                id="loginEmail"
+                name="email"
+                placeholder="Enter your email address"
+                autocomplete="username"
+                inputmode="email"
+                autocapitalize="none"
+                spellcheck="false"
+                required
+            >
+
             <div class="password-wrapper">
-                <input type="password" id="loginPassword" name="password" placeholder="Enter your password" autocomplete="current-password" required>
-                <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Show password" aria-pressed="false">&#128065;</button>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="loginPassword"
+                    aria-label="Show password"
+                    aria-pressed="false"
+                >&#128065;</button>
+
             </div>
+
             <label for="loginRole">Account type</label>
-            <select id="loginRole" name="role" required>
+
+            <select
+                id="loginRole"
+                name="role"
+                required
+            >
                 <option value="student">Student</option>
                 <option value="staff">Staff</option>
             </select>
+
             <button type="submit">Login</button>
+
         </form>
 
-        <section class="recent-accounts-section" aria-labelledby="recentAccountsHeading">
+        <section
+            class="recent-accounts-section"
+            aria-labelledby="recentAccountsHeading"
+        >
+
             <div class="recent-accounts-heading">
-                <h3 id="recentAccountsHeading">Previously logged in accounts</h3>
-                <p>Select an account to quickly switch back to it.</p>
+
+                <h3 id="recentAccountsHeading">
+                    Previously logged in accounts
+                </h3>
+
+                <p>
+                    Select an account to quickly switch back to it.
+                </p>
+
             </div>
-            <div id="recentAccounts" class="recent-accounts" aria-live="polite"></div>
+
+            <div
+                id="recentAccounts"
+                class="recent-accounts"
+                aria-live="polite"
+            ></div>
+
         </section>
 
-        <p id="loginMessage" class="demo-hint" role="alert" aria-live="polite" hidden></p>
-        <p class="demo-hint"><strong>Demo:</strong> demo.student@aun.edu.ng / Demo123!</p>
-        <p class="demo-hint">For a first-time demo account, use any valid email address and password. No email verification is required.</p>
+        <p
+            id="loginMessage"
+            class="demo-hint"
+            role="alert"
+            aria-live="polite"
+            hidden
+        ></p>
+
+        <p class="demo-hint">
+            <strong>Demo:</strong> demo.student@aun.edu.ng / Demo123!
+        </p>
+
+        <p class="demo-hint">
+            For a first-time demo account, use any valid email address and password.
+            No email verification is required.
+        </p>
+
     </div>
+
 </div>
+
 <script src="js/localStore.js"></script>
 <script src="js/auth-standalone.js"></script>
-<div style="text-align:center;margin-top:24px;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.3px;">Built by <strong style="color:rgba(255,255,255,.8);">chomkaTECH™</strong></div>
+
+<div
+    style="text-align:center;margin-top:24px;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.3px;"
+>
+    Built by
+    <strong style="color:rgba(255,255,255,.8);">
+        chomkaTECH™
+    </strong>
+</div>
+
 </body>
 </html>
