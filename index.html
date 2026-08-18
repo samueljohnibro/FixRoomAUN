@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <!-- Primary SEO -->
     <title>FixRoomAUN</title>
@@ -10,6 +14,11 @@
     <meta
         name="description"
         content="FixRoomAUN — A platform for managing accommodation and room-related services at AUN."
+    >
+
+    <meta
+        name="author"
+        content="chomkaTECH™"
     >
 
     <meta
@@ -22,16 +31,21 @@
         content="#080a0f"
     >
 
+    <meta
+        name="color-scheme"
+        content="dark"
+    >
+
     <!-- Favicon -->
     <link
         rel="icon"
         type="image/png"
-        href="assets/fixroomaunlogo.png"
+        href="https://fixroom-aun.netlify.app/assets/fixroomaunlogo.png"
     >
 
     <link
         rel="apple-touch-icon"
-        href="assets/fixroomaunlogo.png"
+        href="https://fixroom-aun.netlify.app/assets/fixroomaunlogo.png"
     >
 
     <!-- Open Graph / WhatsApp / Facebook / LinkedIn -->
@@ -61,18 +75,29 @@
     >
 
     <meta
+        property="og:locale"
+        content="en_US"
+    >
+
+    <!-- Social preview image -->
+    <meta
         property="og:image"
         content="https://fixroom-aun.netlify.app/assets/fixroomaunlogowtext.png"
     >
 
     <meta
-        property="og:image:alt"
-        content="FixRoomAUN Logo"
+        property="og:image:secure_url"
+        content="https://fixroom-aun.netlify.app/assets/fixroomaunlogowtext.png"
     >
 
     <meta
         property="og:image:type"
         content="image/png"
+    >
+
+    <meta
+        property="og:image:alt"
+        content="FixRoomAUN"
     >
 
     <!-- X / Twitter -->
@@ -98,134 +123,153 @@
 
     <meta
         name="twitter:image:alt"
-        content="FixRoomAUN Logo"
+        content="FixRoomAUN"
     >
 
     <!-- Application Styles -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
 </head>
 
 <body>
 
-<div class="login-container">
+    <div class="login-container">
 
-    <img
-        src="assets/fixroomaunlogowtext.png"
-        alt="FixRoomAUN Logo"
-        class="login-logo"
-    >
+        <!-- FixRoomAUN Logo -->
+        <img
+            src="assets/fixroomaunlogowtext.png"
+            alt="FixRoomAUN Logo"
+            class="login-logo"
+        >
 
-    <div id="loginSection">
+        <div id="loginSection">
 
-        <h2>Login</h2>
+            <h2>Login</h2>
 
-        <form id="loginForm" autocomplete="on">
-
-            <input
-                type="email"
-                id="loginEmail"
-                name="email"
-                placeholder="Enter your email address"
-                autocomplete="username"
-                inputmode="email"
-                autocapitalize="none"
-                spellcheck="false"
-                required
+            <form
+                id="loginForm"
+                autocomplete="on"
             >
 
-            <div class="password-wrapper">
-
                 <input
-                    type="password"
-                    id="loginPassword"
-                    name="password"
-                    placeholder="Enter your password"
-                    autocomplete="current-password"
+                    type="email"
+                    id="loginEmail"
+                    name="email"
+                    placeholder="Enter your email address"
+                    autocomplete="username"
+                    inputmode="email"
+                    autocapitalize="none"
+                    spellcheck="false"
                     required
                 >
 
-                <button
-                    type="button"
-                    class="toggle-password"
-                    data-target="loginPassword"
-                    aria-label="Show password"
-                    aria-pressed="false"
-                >&#128065;</button>
+                <div class="password-wrapper">
 
-            </div>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
 
-            <label for="loginRole">Account type</label>
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        data-target="loginPassword"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                    >&#128065;</button>
 
-            <select
-                id="loginRole"
-                name="role"
-                required
+                </div>
+
+                <label for="loginRole">
+                    Account type
+                </label>
+
+                <select
+                    id="loginRole"
+                    name="role"
+                    required
+                >
+                    <option value="student">
+                        Student
+                    </option>
+
+                    <option value="staff">
+                        Staff
+                    </option>
+                </select>
+
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <section
+                class="recent-accounts-section"
+                aria-labelledby="recentAccountsHeading"
             >
-                <option value="student">Student</option>
-                <option value="staff">Staff</option>
-            </select>
 
-            <button type="submit">Login</button>
+                <div class="recent-accounts-heading">
 
-        </form>
+                    <h3 id="recentAccountsHeading">
+                        Previously logged in accounts
+                    </h3>
 
-        <section
-            class="recent-accounts-section"
-            aria-labelledby="recentAccountsHeading"
-        >
+                    <p>
+                        Select an account to quickly switch back to it.
+                    </p>
 
-            <div class="recent-accounts-heading">
+                </div>
 
-                <h3 id="recentAccountsHeading">
-                    Previously logged in accounts
-                </h3>
+                <div
+                    id="recentAccounts"
+                    class="recent-accounts"
+                    aria-live="polite"
+                ></div>
 
-                <p>
-                    Select an account to quickly switch back to it.
-                </p>
+            </section>
 
-            </div>
-
-            <div
-                id="recentAccounts"
-                class="recent-accounts"
+            <p
+                id="loginMessage"
+                class="demo-hint"
+                role="alert"
                 aria-live="polite"
-            ></div>
+                hidden
+            ></p>
 
-        </section>
+            <p class="demo-hint">
+                <strong>Demo:</strong>
+                demo.student@aun.edu.ng / Demo123!
+            </p>
 
-        <p
-            id="loginMessage"
-            class="demo-hint"
-            role="alert"
-            aria-live="polite"
-            hidden
-        ></p>
+            <p class="demo-hint">
+                For a first-time demo account, use any valid email address
+                and password. No email verification is required.
+            </p>
 
-        <p class="demo-hint">
-            <strong>Demo:</strong> demo.student@aun.edu.ng / Demo123!
-        </p>
-
-        <p class="demo-hint">
-            For a first-time demo account, use any valid email address and password.
-            No email verification is required.
-        </p>
+        </div>
 
     </div>
 
-</div>
+    <!-- Application Scripts -->
+    <script src="js/localStore.js"></script>
+    <script src="js/auth-standalone.js"></script>
 
-<script src="js/localStore.js"></script>
-<script src="js/auth-standalone.js"></script>
-
-<div
-    style="text-align:center;margin-top:24px;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.3px;"
->
-    Built by
-    <strong style="color:rgba(255,255,255,.8);">
-        chomkaTECH™
-    </strong>
-</div>
+    <!-- Footer -->
+    <div
+        style="text-align:center;margin-top:24px;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.3px;"
+    >
+        Built by
+        <strong style="color:rgba(255,255,255,.8);">
+            chomkaTECH™
+        </strong>
+    </div>
 
 </body>
 </html>
