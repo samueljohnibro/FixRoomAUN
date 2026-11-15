@@ -9,6 +9,21 @@
 const STORAGE_KEY = "fixroomaun_demo_v1";
 const SESSION_KEY = "fixroomaun_demo_session";
 const RECENT_ACCOUNTS_KEY = "fixroomaun_recent_accounts_v1";
+const LOGGED_OUT_KEY = "fixroomaun_demo_logged_out";
+const CURRENT_SEED_VERSION = 2;
+
+const DEFAULT_DEMO_ACCOUNTS = [
+    {
+        email: "demo.student@aun.edu.ng",
+        account_type: "student",
+        pinned: true
+    },
+    {
+        email: "demo.staff@aun.edu.ng",
+        account_type: "staff",
+        pinned: true
+    }
+];
 
 // Local-file/Guest-browser fallback. Some browsers restrict localStorage for
 // file:// pages; if that happens, keep the demo state in window.name so the
@@ -59,20 +74,55 @@ const demoStorage = {
     }
 };
 
+const now = () => new Date().toISOString();
+
+function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
+function isPinnedDemoAccount(email) {
+    const normalized = String(email || "").trim().toLowerCase();
+    return DEFAULT_DEMO_ACCOUNTS.some(account => account.email === normalized);
+}
 
 function getRecentAccounts() {
+    let stored = [];
     try {
         const raw = demoStorage.get(RECENT_ACCOUNTS_KEY);
         const parsed = raw ? JSON.parse(raw) : [];
-        if (!Array.isArray(parsed)) return [];
-        return parsed.filter(account =>
-            account &&
-            typeof account.email === "string" &&
-            ["student", "staff"].includes(account.account_type)
-        );
+        if (Array.isArray(parsed)) {
+            stored = parsed.filter(account =>
+                account &&
+                typeof account.email === "string" &&
+                ["student", "staff"].includes(account.account_type)
+            );
+        }
     } catch {
-        return [];
+        stored = [];
     }
+
+    // Always include the two primary demo accounts (student and staff) first
+    // so testers can switch between them at any time on the login page.
+    const pinnedEmails = new Set(DEFAULT_DEMO_ACCOUNTS.map(item => item.email));
+    const customAccounts = stored
+        .filter(account => !pinnedEmails.has(account.email.trim().toLowerCase()))
+        .map(account => ({
+            email: account.email.trim().toLowerCase(),
+            account_type: account.account_type === "staff" ? "staff" : "student",
+            last_used_at: account.last_used_at || now(),
+            pinned: false
+        }));
+
+    const combined = [
+        ...DEFAULT_DEMO_ACCOUNTS.map(account => ({
+            ...account,
+            last_used_at: now()
+        })),
+        ...customAccounts
+    ].slice(0, 6);
+
+    demoStorage.set(RECENT_ACCOUNTS_KEY, JSON.stringify(combined));
+    return combined;
 }
 
 function rememberAccount(email, accountType) {
@@ -80,257 +130,42 @@ function rememberAccount(email, accountType) {
     const normalizedType = accountType === "staff" ? "staff" : "student";
     if (!normalizedEmail) return;
 
-    const accounts = getRecentAccounts().filter(account => account.email !== normalizedEmail);
-    accounts.unshift({
+    const current = getRecentAccounts();
+    if (isPinnedDemoAccount(normalizedEmail)) {
+        demoStorage.set(RECENT_ACCOUNTS_KEY, JSON.stringify(current));
+        return;
+    }
+
+    const pinned = current.filter(account => isPinnedDemoAccount(account.email));
+    const others = current.filter(
+        account => !isPinnedDemoAccount(account.email) && account.email !== normalizedEmail
+    );
+
+    others.unshift({
         email: normalizedEmail,
         account_type: normalizedType,
-        last_used_at: now()
+        last_used_at: now(),
+        pinned: false
     });
-    demoStorage.set(RECENT_ACCOUNTS_KEY, JSON.stringify(accounts.slice(0, 6)));
+
+    demoStorage.set(RECENT_ACCOUNTS_KEY, JSON.stringify([...pinned, ...others].slice(0, 6)));
 }
 
 function forgetRecentAccount(email) {
     const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (isPinnedDemoAccount(normalizedEmail)) return;
     const accounts = getRecentAccounts().filter(account => account.email !== normalizedEmail);
     demoStorage.set(RECENT_ACCOUNTS_KEY, JSON.stringify(accounts));
 }
 
-const now = () => new Date().toISOString();
-
-function clone(value) {
-    return JSON.parse(JSON.stringify(value));
-}
-
-const seedState = () => ({
-    users: [
-        {
-            id: "demo-student-001",
-            email: "demo.student@aun.edu.ng",
-            password: "Demo123!",
-            student_id: "A12345678",
-            role: "student",
-            housing: {
-                dorm: "AA",
-                room_number: "101",
-                room_type: "2 in 1 — With Facilities",
-                semester: "Fall 2026"
-            }
-        },
-        {
-            id: "demo-staff-001",
-            email: "demo.staff@aun.edu.ng",
-            password: "Demo123!",
-            student_id: null,
-            role: "maintenance_staff",
-            housing: null
-        },
-        {
-            id: "demo-head-001",
-            email: "demo.head@aun.edu.ng",
-            password: "Demo123!",
-            student_id: null,
-            role: "maintenance_head",
-            housing: null
-        },
-        {
-            id: "demo-admin-001",
-            email: "demo.admin@aun.edu.ng",
-            password: "Demo123!",
-            student_id: null,
-            role: "overall_admin",
-            housing: null
-        }
-    ],
-    tickets: [
-        {
-            id: "ticket-1001",
-            ticket_number: "FR-10001",
-            student_email: "demo.student@aun.edu.ng",
-            dorm: "AA",
-            room_number: "101",
-            category: "Air Conditioner",
-            description: "Air conditioner is not cooling the room properly.",
-            status: "In Progress",
-            image_url: null,
-            feedback: null,
-            feedback_given: false,
-            reopen_reason: null,
-            created_at: "2026-04-08T09:30:00.000Z",
-            updated_at: "2026-04-09T11:15:00.000Z"
-        },
-        {
-            id: "ticket-1002",
-            ticket_number: "FR-10002",
-            student_email: "demo.student@aun.edu.ng",
-            dorm: "AA",
-            room_number: "101",
-            category: "Power Socket",
-            description: "The wall socket beside the study desk is loose.",
-            status: "Completed",
-            image_url: null,
-            feedback: null,
-            feedback_given: false,
-            reopen_reason: null,
-            created_at: "2026-04-03T14:20:00.000Z",
-            updated_at: "2026-04-05T16:45:00.000Z"
-        },
-        {
-            id: "ticket-1003",
-            ticket_number: "FR-10003",
-            student_email: "another.student@aun.edu.ng",
-            dorm: "BB",
-            room_number: "203",
-            category: "Door",
-            description: "Bedroom door handle is difficult to turn.",
-            status: "Pending",
-            image_url: null,
-            feedback: null,
-            feedback_given: false,
-            reopen_reason: null,
-            created_at: "2026-04-10T08:10:00.000Z",
-            updated_at: "2026-04-10T08:10:00.000Z"
-        },
-        {
-            id: "ticket-1004",
-            ticket_number: "FR-10004",
-            student_email: "another.student@aun.edu.ng",
-            dorm: "CC",
-            room_number: "305",
-            category: "Ceiling Light",
-            description: "Ceiling light is flickering intermittently.",
-            status: "Cancelled",
-            image_url: null,
-            feedback: null,
-            feedback_given: false,
-            reopen_reason: null,
-            created_at: "2026-04-01T12:00:00.000Z",
-            updated_at: "2026-04-02T10:00:00.000Z"
-        }
-    ]
-});
-
-function readState() {
-    const raw = demoStorage.get(STORAGE_KEY);
-    if (!raw) {
-        const initial = seedState();
-        demoStorage.set(STORAGE_KEY, JSON.stringify(initial));
-        return initial;
-    }
-
-    try {
-        const parsed = JSON.parse(raw);
-        if (!parsed || !Array.isArray(parsed.users) || !Array.isArray(parsed.tickets)) {
-            throw new Error("Invalid demo state");
-        }
-        return parsed;
-    } catch {
-        const initial = seedState();
-        demoStorage.set(STORAGE_KEY, JSON.stringify(initial));
-        return initial;
-    }
-}
-
-function writeState(state) {
-    demoStorage.set(STORAGE_KEY, JSON.stringify(state));
-}
-
-function getCurrentUser() {
-    const email = demoStorage.get(SESSION_KEY);
-    if (!email) return null;
-    return readState().users.find(user => user.email === email) || null;
-}
-
-function isStaffRole(role) {
-    return ["maintenance_staff", "maintenance_head", "overall_admin"].includes(role);
-}
-
-function login(email, password, selectedRole = "student") {
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-    const role = selectedRole === "staff" ? "staff" : "student";
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-        return { user: null, error: "Please enter a valid email address." };
-    }
-    if (!String(password || "").trim()) {
-        return { user: null, error: "Please enter your password." };
-    }
-
-    const state = readState();
-    let user = state.users.find(item => item.email === normalizedEmail);
-
-    if (!user) {
-        user = {
-            id: `demo-user-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            email: normalizedEmail,
-            password: String(password),
-            student_id: null,
-            role: role === "staff" ? "maintenance_staff" : "student",
-            housing: null
-        };
-        state.users.push(user);
-        writeState(state);
-    } else {
-        if (user.password !== String(password)) {
-            return { user: null, error: "Incorrect password." };
-        }
-
-        const isStaffAccount = ["maintenance_staff", "maintenance_head", "overall_admin"].includes(user.role);
-        const requestedStaff = role === "staff";
-        if (isStaffAccount !== requestedStaff) {
-            return {
-                user: null,
-                error: `This account is registered as a ${isStaffAccount ? "staff" : "student"} account. Select the matching account type.`
-            };
-        }
-    }
-
-    if (user.role === "student") {
-        ensureDemoStudentProfile(user.email);
-        user = readState().users.find(item => item.email === user.email) || user;
-    }
-
-    demoStorage.set(SESSION_KEY, user.email);
-    rememberAccount(user.email, isStaffRole(user.role) ? "staff" : "student");
-    return { user: clone(user), error: null };
-}
-
-function logout() {
-    demoStorage.remove(SESSION_KEY);
-    return true;
-}
-
-function signup({ email, password, studentId, dorm, roomNumber, roomType, semester }) {
-    const state = readState();
-    const normalizedEmail = email.trim().toLowerCase();
-
-    if (state.users.some(user => user.email === normalizedEmail)) {
-        return { user: null, error: "An account with this email already exists." };
-    }
-
-    const user = {
-        id: `demo-user-${Date.now()}`,
-        email: normalizedEmail,
-        password,
-        student_id: studentId,
-        role: "student",
-        housing: { dorm, room_number: roomNumber, room_type: roomType, semester }
-    };
-
-    state.users.push(user);
-    writeState(state);
-    return { user: clone(user), error: null };
-}
-
-function getUserByEmail(email) {
-    return readState().users.find(user => user.email === email.trim().toLowerCase()) || null;
-}
-
 // ---------------------------------------------------------------------------
-// Demo housing/profile generator
+// Demo housing/profile & random repair-request generator
 // ---------------------------------------------------------------------------
-// The prototype deliberately models a realistic campus allocation without
-// pretending to connect to a live university housing database. The allocation
-// is deterministic per email, so the same demo account keeps the same profile.
+// The prototype models a realistic campus allocation without connecting to a
+// live university housing database. Student housing is deterministic per email,
+// while initial repair requests are randomly generated once per browser account
+// and then persisted in localStorage so they stay consistent across reloads and
+// can be worked on between the student and staff dashboards.
 const DEMO_FIRST_NAMES = [
     "Daniel", "David", "Samuel", "Michael", "Joshua", "Nathan", "Caleb",
     "Emmanuel", "Joseph", "Isaac", "Benjamin", "Andrew", "Gabriel", "Matthew",
@@ -348,6 +183,88 @@ const DEMO_DORMS = [
     "Gabrielle Volpi Girls",
     "Aisha Khande"
 ];
+
+const ISSUE_TEMPLATES_BY_CATEGORY = {
+    "Air Conditioner": [
+        "Air conditioner is blowing warm air and not cooling the room properly.",
+        "Indoor AC unit is making a rattling noise when fan speed is set to medium.",
+        "Water is slowly dripping from the front panel of the air conditioner.",
+        "Air conditioner remote sensor is unresponsive and unit stays on standby."
+    ],
+    "Power Socket": [
+        "The wall socket beside the study desk is loose and needs tightening.",
+        "Double power outlet near the bedside table is not supplying power.",
+        "Wall socket switch is stuck halfway and charger plugs do not fit securely."
+    ],
+    "Ceiling Light": [
+        "Main ceiling light flickers intermittently when switched on at night.",
+        "Ceiling fluorescent lamp has burnt out and needs replacement.",
+        "Ceiling light wall switch feels loose and takes several clicks to turn on."
+    ],
+    "Side Reading Light": [
+        "Bedside reading lamp does not turn on when the switch is flipped.",
+        "Side reading light adjustable arm is loose and droops down.",
+        "Reading light bulb is dim and flickers slightly when adjusted."
+    ],
+    "Bed": [
+        "Wooden bed frame slats are loose and creak loudly when sitting down.",
+        "One of the bed support legs is slightly uneven and wobbles.",
+        "Bed headboard bracket is loose and taps against the wall."
+    ],
+    "Wardrobe": [
+        "Wardrobe right door hinge is misaligned and does not close flush.",
+        "Hanging rod bracket inside the wardrobe has come loose on one side.",
+        "Wardrobe drawer runner is sticking and difficult to pull open."
+    ],
+    "Door": [
+        "Room entry door handle is stiff and difficult to turn from the inside.",
+        "Overhead door closer pulls the door shut too hard and slams loudly.",
+        "Bathroom door latch does not catch properly when closed."
+    ],
+    "Window": [
+        "Window latch is loose and the casement cannot lock tightly.",
+        "Window insect screen frame has a small gap at the bottom corner.",
+        "Sliding window track is stiff and difficult to push open for ventilation."
+    ],
+    "Toilet": [
+        "Toilet cistern keeps running continuously after flushing.",
+        "Toilet flush lever is loose and requires multiple presses to flush.",
+        "Toilet tank refills very slowly after each use."
+    ],
+    "Bathtub": [
+        "Bathtub drain is partially clogged and water drains out very slowly.",
+        "Shower mixer tap continues dripping slightly when turned off.",
+        "Silicone sealant along the edge of the bathtub is peeling away."
+    ],
+    "Wash Hand Basin": [
+        "Wash hand basin tap is loose at the base and wobbles when turned.",
+        "Pipe joint underneath the wash hand basin has a slow water drip.",
+        "Basin pop-up drain stopper is stuck in the closed position."
+    ]
+};
+
+function randomInt(maxExclusive) {
+    if (maxExclusive <= 1) return 0;
+    try {
+        if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+            const array = new Uint32Array(1);
+            window.crypto.getRandomValues(array);
+            return array[0] % maxExclusive;
+        }
+    } catch {}
+    return Math.floor(Math.random() * maxExclusive);
+}
+
+function shuffleArray(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = randomInt(i + 1);
+        const temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+    }
+    return copy;
+}
 
 function normalizeDormName(dorm, email = "") {
     const value = String(dorm || "").trim();
@@ -464,9 +381,298 @@ function buildDemoProfile(email) {
     };
 }
 
+function generateUniqueTicketNumber(existingTickets = []) {
+    const used = new Set(existingTickets.map(ticket => ticket.ticket_number));
+    let ticketNumber;
+    do {
+        ticketNumber = `FR-${String(10000 + randomInt(90000))}`;
+    } while (used.has(ticketNumber));
+    return ticketNumber;
+}
+
+function generateRandomTicketsForStudent(studentUser, existingTickets = []) {
+    const normalizedEmail = String(studentUser.email || "").trim().toLowerCase();
+    const housing = normalizeHousing(studentUser.housing, normalizedEmail);
+    const allCategories = Object.keys(ISSUE_TEMPLATES_BY_CATEGORY);
+    const selectedCategories = shuffleArray(allCategories).slice(0, 4);
+
+    // Include Pending, In Progress, and Completed so the tickets can immediately
+    // be worked on in the staff dashboard and reviewed/rated by the student.
+    const statusPool = shuffleArray([
+        "Pending",
+        "In Progress",
+        "Completed",
+        randomInt(2) === 0 ? "Pending" : "In Progress"
+    ]);
+
+    const nowMs = Date.now();
+    const generatedTickets = [];
+
+    selectedCategories.forEach((category, index) => {
+        const descriptions = ISSUE_TEMPLATES_BY_CATEGORY[category];
+        const description = descriptions[randomInt(descriptions.length)];
+        const status = statusPool[index] || "Pending";
+
+        // Stagger creation times over the past 1 to 6 days
+        const daysAgoCreated = 1 + index + (randomInt(12) / 24);
+        const createdMs = nowMs - Math.round(daysAgoCreated * 86400000);
+        const updatedOffsetHours = status === "Pending" ? 0 : (4 + randomInt(28));
+        const updatedMs = Math.min(nowMs - (index * 60000), createdMs + updatedOffsetHours * 3600000);
+
+        const ticketNumber = generateUniqueTicketNumber([...existingTickets, ...generatedTickets]);
+        generatedTickets.push({
+            id: `ticket-${nowMs}-${index}-${randomInt(100000)}`,
+            ticket_number: ticketNumber,
+            student_email: normalizedEmail,
+            dorm: housing.dorm,
+            room_number: String(housing.room_number),
+            category,
+            description,
+            status,
+            image_url: null,
+            feedback: null,
+            feedback_given: false,
+            reopen_reason: null,
+            created_at: new Date(createdMs).toISOString(),
+            updated_at: new Date(updatedMs).toISOString()
+        });
+    });
+
+    return generatedTickets;
+}
+
+const seedState = () => {
+    const demoStudentEmail = "demo.student@aun.edu.ng";
+    const generatedProfile = buildDemoProfile(demoStudentEmail);
+    const studentHousing = normalizeHousing(
+        {
+            dorm: "AA",
+            room_number: "101",
+            room_type: "3 in 1 — With Facilities",
+            semester: "Fall 2026"
+        },
+        demoStudentEmail
+    );
+
+    const demoStudentUser = {
+        id: "demo-student-001",
+        email: demoStudentEmail,
+        password: "Demo123!",
+        name: generatedProfile.name,
+        student_id: "A12345678",
+        role: "student",
+        housing: studentHousing,
+        seeded_tickets: true
+    };
+
+    const tickets = generateRandomTicketsForStudent(demoStudentUser, []);
+
+    return {
+        seed_version: CURRENT_SEED_VERSION,
+        users: [
+            demoStudentUser,
+            {
+                id: "demo-staff-001",
+                email: "demo.staff@aun.edu.ng",
+                password: "Demo123!",
+                student_id: null,
+                role: "maintenance_staff",
+                housing: null
+            },
+            {
+                id: "demo-head-001",
+                email: "demo.head@aun.edu.ng",
+                password: "Demo123!",
+                student_id: null,
+                role: "maintenance_head",
+                housing: null
+            },
+            {
+                id: "demo-admin-001",
+                email: "demo.admin@aun.edu.ng",
+                password: "Demo123!",
+                student_id: null,
+                role: "overall_admin",
+                housing: null
+            }
+        ],
+        tickets
+    };
+};
+
+function readState() {
+    const raw = demoStorage.get(STORAGE_KEY);
+    if (!raw) {
+        const initial = seedState();
+        demoStorage.set(STORAGE_KEY, JSON.stringify(initial));
+        getRecentAccounts();
+        if (!isExplicitlyLoggedOut() && !demoStorage.get(SESSION_KEY)) {
+            demoStorage.set(SESSION_KEY, "demo.student@aun.edu.ng");
+        }
+        return initial;
+    }
+
+    try {
+        const parsed = JSON.parse(raw);
+        if (
+            !parsed ||
+            parsed.seed_version !== CURRENT_SEED_VERSION ||
+            !Array.isArray(parsed.users) ||
+            !Array.isArray(parsed.tickets)
+        ) {
+            throw new Error("Outdated or invalid demo state");
+        }
+        return parsed;
+    } catch {
+        const initial = seedState();
+        demoStorage.set(STORAGE_KEY, JSON.stringify(initial));
+        getRecentAccounts();
+        if (!isExplicitlyLoggedOut() && !demoStorage.get(SESSION_KEY)) {
+            demoStorage.set(SESSION_KEY, "demo.student@aun.edu.ng");
+        }
+        return initial;
+    }
+}
+
+function writeState(state) {
+    demoStorage.set(STORAGE_KEY, JSON.stringify(state));
+}
+
+function isExplicitlyLoggedOut() {
+    try {
+        if (window.sessionStorage.getItem(LOGGED_OUT_KEY) === "true") return true;
+    } catch {}
+    return demoStorage.get(LOGGED_OUT_KEY) === "true";
+}
+
+function setExplicitlyLoggedOut(loggedOut) {
+    if (loggedOut) {
+        try {
+            window.sessionStorage.setItem(LOGGED_OUT_KEY, "true");
+        } catch {}
+        demoStorage.set(LOGGED_OUT_KEY, "true");
+    } else {
+        try {
+            window.sessionStorage.removeItem(LOGGED_OUT_KEY);
+        } catch {}
+        demoStorage.remove(LOGGED_OUT_KEY);
+    }
+}
+
+function startWithDemoStudent() {
+    const state = readState();
+    ensureDemoStudentProfile("demo.student@aun.edu.ng");
+    getRecentAccounts();
+    setExplicitlyLoggedOut(false);
+    demoStorage.set(SESSION_KEY, "demo.student@aun.edu.ng");
+    return state.users.find(user => user.email === "demo.student@aun.edu.ng") || null;
+}
+
+function getCurrentUser() {
+    const state = readState();
+    let email = demoStorage.get(SESSION_KEY);
+    if (!email && !isExplicitlyLoggedOut()) {
+        email = "demo.student@aun.edu.ng";
+        demoStorage.set(SESSION_KEY, email);
+    }
+    if (!email) return null;
+    return state.users.find(user => user.email === email) || null;
+}
+
+function isStaffRole(role) {
+    return ["maintenance_staff", "maintenance_head", "overall_admin"].includes(role);
+}
+
+function login(email, password, selectedRole = "student") {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const role = selectedRole === "staff" ? "staff" : "student";
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+        return { user: null, error: "Please enter a valid email address." };
+    }
+    if (!String(password || "").trim()) {
+        return { user: null, error: "Please enter your password." };
+    }
+
+    const state = readState();
+    let user = state.users.find(item => item.email === normalizedEmail);
+
+    if (!user) {
+        user = {
+            id: `demo-user-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            email: normalizedEmail,
+            password: String(password),
+            student_id: null,
+            role: role === "staff" ? "maintenance_staff" : "student",
+            housing: null,
+            seeded_tickets: false
+        };
+        state.users.push(user);
+        writeState(state);
+    } else {
+        if (user.password !== String(password)) {
+            return { user: null, error: "Incorrect password." };
+        }
+
+        const isStaffAccount = ["maintenance_staff", "maintenance_head", "overall_admin"].includes(user.role);
+        const requestedStaff = role === "staff";
+        if (isStaffAccount !== requestedStaff) {
+            return {
+                user: null,
+                error: `This account is registered as a ${isStaffAccount ? "staff" : "student"} account. Select the matching account type.`
+            };
+        }
+    }
+
+    if (user.role === "student") {
+        ensureDemoStudentProfile(user.email);
+        user = readState().users.find(item => item.email === user.email) || user;
+    }
+
+    setExplicitlyLoggedOut(false);
+    demoStorage.set(SESSION_KEY, user.email);
+    rememberAccount(user.email, isStaffRole(user.role) ? "staff" : "student");
+    return { user: clone(user), error: null };
+}
+
+function logout() {
+    setExplicitlyLoggedOut(true);
+    demoStorage.remove(SESSION_KEY);
+    return true;
+}
+
+function signup({ email, password, studentId, dorm, roomNumber, roomType, semester }) {
+    const state = readState();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (state.users.some(user => user.email === normalizedEmail)) {
+        return { user: null, error: "An account with this email already exists." };
+    }
+
+    const user = {
+        id: `demo-user-${Date.now()}`,
+        email: normalizedEmail,
+        password,
+        student_id: studentId,
+        role: "student",
+        housing: { dorm, room_number: roomNumber, room_type: roomType, semester },
+        seeded_tickets: false
+    };
+
+    state.users.push(user);
+    writeState(state);
+    ensureDemoStudentProfile(normalizedEmail);
+    return { user: clone(getUserByEmail(normalizedEmail) || user), error: null };
+}
+
+function getUserByEmail(email) {
+    return readState().users.find(user => user.email === String(email || "").trim().toLowerCase()) || null;
+}
+
 function ensureDemoStudentProfile(email) {
     const state = readState();
-    const user = state.users.find(item => item.email === String(email).trim().toLowerCase());
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const user = state.users.find(item => item.email === normalizedEmail);
     if (!user || user.role !== "student") return null;
 
     const generated = buildDemoProfile(user.email);
@@ -483,6 +689,18 @@ function ensureDemoStudentProfile(email) {
     }
     if (!user.student_id) {
         user.student_id = generated.student_id;
+        changed = true;
+    }
+
+    // Seed initial random repair requests once per student account in this browser
+    // so every student account starts with realistic requests visible to staff.
+    if (!user.seeded_tickets) {
+        const hasTickets = state.tickets.some(ticket => ticket.student_email === normalizedEmail);
+        if (!hasTickets) {
+            const seededTickets = generateRandomTicketsForStudent(user, state.tickets);
+            state.tickets.push(...seededTickets);
+        }
+        user.seeded_tickets = true;
         changed = true;
     }
 
@@ -516,8 +734,10 @@ function updateHousing(email, housing) {
 }
 
 function getTicketsForStudent(email) {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    ensureDemoStudentProfile(normalizedEmail);
     return readState().tickets
-        .filter(ticket => ticket.student_email === email)
+        .filter(ticket => ticket.student_email === normalizedEmail)
         .map(ticket => ({
             ...ticket,
             dorm: normalizeDormName(ticket.dorm, ticket.student_email) || ticket.dorm || "Unassigned"
@@ -566,10 +786,7 @@ function createTicket({ studentEmail, category, description, imageUrl = null }) 
     }
 
     const state = readState();
-    let ticketNumber;
-    do {
-        ticketNumber = `FR-${String(Math.floor(10000 + Math.random() * 90000))}`;
-    } while (state.tickets.some(ticket => ticket.ticket_number === ticketNumber));
+    const ticketNumber = generateUniqueTicketNumber(state.tickets);
 
     const ticket = {
         id: `ticket-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -637,13 +854,20 @@ function buildAnalytics(tickets) {
     let negativeFeedback = 0;
     let resolutionTotal = 0;
     let resolutionCount = 0;
+    let resolvedCount = 0;
 
     tickets.forEach(ticket => {
+        const isStudentClosed =
+            ticket.status === "Closed" ||
+            (ticket.status === "Completed" && ticket.feedback === "positive" && ticket.feedback_given === true);
+
         if (ticket.status === "Pending") status.pending++;
         if (ticket.status === "In Progress") status.inProgress++;
         if (ticket.status === "Completed") status.completed++;
         if (ticket.status === "Cancelled") status.cancelled++;
-        if (ticket.status === "Closed") status.closed++;
+        if (isStudentClosed) status.closed++;
+        if (ticket.status === "Completed" || ticket.status === "Closed") resolvedCount++;
+
         category[ticket.category] = (category[ticket.category] || 0) + 1;
         const normalizedDorm = normalizeDormName(ticket.dorm, ticket.student_email) || ticket.dorm || "Unassigned";
         dorm[normalizedDorm] = (dorm[normalizedDorm] || 0) + 1;
@@ -662,7 +886,7 @@ function buildAnalytics(tickets) {
     });
 
     const completionRate = tickets.length
-        ? Math.round(((status.completed + status.closed) / tickets.length) * 100)
+        ? Math.round((resolvedCount / tickets.length) * 100)
         : 0;
 
     return {
@@ -696,11 +920,14 @@ function getAnalyticsForUser(email, role) {
 }
 
 function resetDemoData() {
+    const previousSession = demoStorage.get(SESSION_KEY);
     demoStorage.remove(STORAGE_KEY);
-    demoStorage.remove(SESSION_KEY);
-    return readState();
+    const freshState = readState();
+    if (previousSession) {
+        demoStorage.set(SESSION_KEY, previousSession);
+    }
+    return freshState;
 }
-
 
 // Expose the demo data layer for classic browser scripts.
 // This intentionally avoids ES modules so the prototype also works when opened
@@ -708,6 +935,9 @@ function resetDemoData() {
 window.FixRoomStore = {
     readState,
     getCurrentUser,
+    startWithDemoStudent,
+    isExplicitlyLoggedOut,
+    isPinnedDemoAccount,
     login,
     logout,
     signup,

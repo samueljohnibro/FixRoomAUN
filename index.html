@@ -40,12 +40,12 @@
     <link
         rel="icon"
         type="image/png"
-        href="https://fixroom-aun.netlify.app/assets/fixroomaunlogo.png"
+        href="assets/fixroomaunlogo.png"
     >
 
     <link
         rel="apple-touch-icon"
-        href="https://fixroom-aun.netlify.app/assets/fixroomaunlogo.png"
+        href="assets/fixroomaunlogo.png"
     >
 
     <!-- Open Graph / WhatsApp / Facebook / LinkedIn -->
@@ -144,6 +144,20 @@
         rel="stylesheet"
         href="css/styles.css"
     >
+
+    <!-- Demo Entry Redirect: Always start from the logged-in demo student dashboard unless explicitly logged out -->
+    <script src="js/localStore.js"></script>
+    <script>
+        (() => {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                if (!params.has("logged_out") && window.FixRoomStore) {
+                    window.FixRoomStore.startWithDemoStudent();
+                    window.location.replace("dashboard.html");
+                }
+            } catch (error) {}
+        })();
+    </script>
 </head>
 
 <body class="login-page">
@@ -258,8 +272,9 @@
             ></p>
 
             <p class="demo-hint demo-credentials">
-                <strong>Demo:</strong>
-                demo.student@aun.edu.ng / Demo123!
+                <strong>Demo Student:</strong> demo.student@aun.edu.ng<br>
+                <strong>Demo Staff:</strong> demo.staff@aun.edu.ng<br>
+                <span>Password for both: <strong>Demo123!</strong></span>
             </p>
 
             <p class="demo-hint">
@@ -277,7 +292,6 @@
     </footer>
 
     <!-- Application Scripts -->
-    <script src="js/localStore.js"></script>
     <script src="js/auth-standalone.js"></script>
 
 </body>

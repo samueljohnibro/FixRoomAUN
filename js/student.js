@@ -4,12 +4,14 @@
     const store = window.FixRoomStore;
     if (!store) {
         console.error("FixRoomAUN: demo data layer is unavailable.");
-        window.location.replace("index.html");
+        window.location.replace("index.html?logged_out=1");
         return;
     }
 
     const {
         getCurrentUser,
+        startWithDemoStudent,
+        isExplicitlyLoggedOut,
         logout,
         getHousing,
         getStudentProfile,
@@ -20,13 +22,26 @@
     } = store;
 
     function routeToLogin() {
-        window.location.replace("index.html");
+        window.location.replace("index.html?logged_out=1");
     }
 
     function getActiveStudent() {
-        const current = getCurrentUser();
-        if (!current || current.role !== "student") {
+        let current = getCurrentUser();
+        if (!current && !isExplicitlyLoggedOut?.()) {
+            current = startWithDemoStudent?.() || null;
+        }
+        if (!current) {
             routeToLogin();
+            return null;
+        }
+        if (current.role !== "student") {
+            if (current.role === "maintenance_staff") {
+                window.location.replace("staff.html");
+            } else if (["maintenance_head", "overall_admin"].includes(current.role)) {
+                window.location.replace("admin.html");
+            } else {
+                routeToLogin();
+            }
             return null;
         }
         return current;
@@ -116,7 +131,25 @@
     });
 
     window.addEventListener("pageshow", () => {
-        if (!getCurrentUser()) routeToLogin();
+        if (isExplicitlyLoggedOut?.() || !getCurrentUser()) {
+            routeToLogin();
+            return;
+        }
+        loadTickets();
+    });
+
+    window.addEventListener("storage", () => {
+        if (isExplicitlyLoggedOut?.()) {
+            routeToLogin();
+            return;
+        }
+        loadTickets();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && !isExplicitlyLoggedOut?.()) {
+            loadTickets();
+        }
     });
 
     function openConfirm(message, action) {

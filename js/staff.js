@@ -3,19 +3,30 @@
 
     const store = window.FixRoomStore;
     if (!store) {
-        window.location.replace("index.html");
+        window.location.replace("index.html?logged_out=1");
         return;
     }
 
-    const { getCurrentUser, logout, getAllTickets, updateTicket } = store;
+    const {
+        getCurrentUser,
+        isExplicitlyLoggedOut,
+        logout,
+        getAllTickets,
+        updateTicket
+    } = store;
 
     function routeToLogin() {
-        window.location.replace("index.html");
+        window.location.replace("index.html?logged_out=1");
     }
 
     const user = getCurrentUser();
-    if (!user || !["maintenance_staff", "maintenance_head", "overall_admin"].includes(user.role)) {
+    if (!user || isExplicitlyLoggedOut?.()) {
         routeToLogin();
+        return;
+    }
+
+    if (!["maintenance_staff", "maintenance_head", "overall_admin"].includes(user.role)) {
+        window.location.replace("dashboard.html");
         return;
     }
 
@@ -35,11 +46,29 @@
         logout();
         // Replace the current document so the authenticated page is not
         // retained as the active navigation entry.
-        window.location.replace("index.html");
+        routeToLogin();
     });
 
     window.addEventListener("pageshow", () => {
-        if (!getCurrentUser()) routeToLogin();
+        if (isExplicitlyLoggedOut?.() || !getCurrentUser()) {
+            routeToLogin();
+            return;
+        }
+        loadTickets();
+    });
+
+    window.addEventListener("storage", () => {
+        if (isExplicitlyLoggedOut?.()) {
+            routeToLogin();
+            return;
+        }
+        loadTickets();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && !isExplicitlyLoggedOut?.()) {
+            loadTickets();
+        }
     });
 
     statusFilter?.addEventListener("change", loadTickets);
@@ -86,6 +115,15 @@
         const allowedStatuses = ["Pending", "In Progress", "Completed", "Cancelled"];
 
         tickets.forEach(ticket => {
+            const studentClosed =
+                ticket.status === "Completed" &&
+                ticket.feedback === "positive" &&
+                ticket.feedback_given === true;
+            const badgeLabel = studentClosed ? "Closed by Student" : ticket.status;
+            const badgeClass = studentClosed
+                ? "status-closed"
+                : `status-${String(ticket.status).toLowerCase().replace(/\s+/g, "-")}`;
+
             const card = document.createElement("div");
             card.className = "ticket-card";
             card.innerHTML = `
@@ -101,10 +139,12 @@
                         <p><b>Category:</b> ${escapeHtml(ticket.category)}</p>
                         <p><b>Description:</b> ${escapeHtml(ticket.description)}</p>
                         ${ticket.reopen_reason ? `<p><b>Reopen reason:</b> ${escapeHtml(ticket.reopen_reason)}</p>` : ""}
+                        ${studentClosed ? `<p><b>Student feedback:</b> 👍 Confirmed resolved</p>` : ""}
                         ${ticket.image_url ? `<img src="${ticket.image_url}" class="ticket-image" alt="Attached issue">` : ""}
                     </div>
                 </div>
                 <div class="ticket-right">
+                    <span class="ticket-status ${badgeClass}">${escapeHtml(badgeLabel)}</span>
                     <label class="sr-only" for="status-${escapeHtml(ticket.id)}">Update status</label>
                     <select id="status-${escapeHtml(ticket.id)}" data-id="${escapeHtml(ticket.id)}" class="statusUpdate" autocomplete="off">
                         ${allowedStatuses.map(status => `<option value="${status}">${status}</option>`).join("")}

@@ -3,15 +3,26 @@
 
     const store = window.FixRoomStore;
     if (!store) {
-        window.location.replace("index.html");
+        window.location.replace("index.html?logged_out=1");
         return;
     }
 
-    const { getCurrentUser, getAnalyticsForUser, logout } = store;
+    const {
+        getCurrentUser,
+        isExplicitlyLoggedOut,
+        getAnalyticsForUser,
+        resetDemoData,
+        logout
+    } = store;
+
+    function routeToLogin() {
+        window.location.replace("index.html?logged_out=1");
+    }
+
     const user = getCurrentUser?.();
 
-    if (!user) {
-        window.location.replace("index.html");
+    if (!user || isExplicitlyLoggedOut?.()) {
+        routeToLogin();
         return;
     }
 
@@ -20,7 +31,10 @@
     const homePage = isStaff ? "staff.html" : "dashboard.html";
 
     const email = document.getElementById("analyticsEmail");
-    if (email) email.textContent = user.email;
+    if (email) {
+        email.textContent = user.email;
+        email.title = user.email;
+    }
 
     const roleLabel = document.getElementById("analyticsRoleLabel");
     if (roleLabel) roleLabel.textContent = isStaff ? "Maintenance Operations" : "Personal Maintenance Activity";
@@ -42,7 +56,19 @@
         event.preventDefault();
         event.stopPropagation();
         logout();
-        window.location.replace("index.html");
+        routeToLogin();
+    });
+
+    const resetDemoBtn = document.getElementById("resetDemoBtn");
+    resetDemoBtn?.addEventListener("click", event => {
+        event.preventDefault();
+        resetDemoData?.();
+        render();
+        const originalLabel = resetDemoBtn.textContent;
+        resetDemoBtn.textContent = "Demo Data Reset ✓";
+        window.setTimeout(() => {
+            resetDemoBtn.textContent = originalLabel;
+        }, 1600);
     });
 
     function escapeHtml(value = "") {
@@ -83,6 +109,8 @@
         setText("pending", status.pending || 0);
         setText("inProgress", status.inProgress || 0);
         setText("completed", status.completed || 0);
+        setText("cancelled", status.cancelled || 0);
+        setText("closed", status.closed || 0);
         setText("reopened", data.reopened || 0);
         setText("completionRate", `${data.completionRate || 0}%`);
 
@@ -93,13 +121,19 @@
         if (recent) {
             recent.innerHTML = "";
             (data.recent || []).forEach(ticket => {
+                const studentClosed =
+                    !isStaff &&
+                    ticket.status === "Completed" &&
+                    ticket.feedback === "positive" &&
+                    ticket.feedback_given === true;
+                const displayStatus = studentClosed ? "Closed" : ticket.status;
                 const item = document.createElement("li");
                 item.innerHTML = `
                     <div>
                         <strong>${escapeHtml(ticket.ticket_number)}</strong>
                         <span>${escapeHtml(ticket.category)} · ${escapeHtml(ticket.dorm || "N/A")} ${ticket.room_number ? `· Room ${escapeHtml(ticket.room_number)}` : ""}</span>
                     </div>
-                    <span class="ticket-status status-${String(ticket.status).toLowerCase().replace(/\s+/g, "-")}">${escapeHtml(ticket.status)}</span>`;
+                    <span class="ticket-status status-${String(displayStatus).toLowerCase().replace(/\s+/g, "-")}">${escapeHtml(displayStatus)}</span>`;
                 recent.appendChild(item);
             });
             if (!recent.children.length) recent.innerHTML = `<li class="analytics-empty">No recent activity.</li>`;
@@ -118,9 +152,23 @@
     }
 
     render();
-    window.addEventListener("pageshow", render);
-    window.addEventListener("storage", render);
+    window.addEventListener("pageshow", () => {
+        if (isExplicitlyLoggedOut?.() || !getCurrentUser()) {
+            routeToLogin();
+            return;
+        }
+        render();
+    });
+    window.addEventListener("storage", () => {
+        if (isExplicitlyLoggedOut?.()) {
+            routeToLogin();
+            return;
+        }
+        render();
+    });
     document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) render();
+        if (!document.hidden && !isExplicitlyLoggedOut?.()) {
+            render();
+        }
     });
 })();
