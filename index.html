@@ -28,7 +28,7 @@
 
     <meta
         name="theme-color"
-        content="#080a0f"
+        content="#060b14"
     >
 
     <meta
@@ -128,12 +128,25 @@
 
     <!-- Application Styles -->
     <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    >
+    <link
         rel="stylesheet"
         href="css/styles.css"
     >
 </head>
 
-<body>
+<body class="login-page">
 
     <div class="login-container">
 
@@ -147,6 +160,7 @@
         <div id="loginSection">
 
             <h2>Login</h2>
+            <p class="login-subtitle">Smart Campus Maintenance Platform</p>
 
             <form
                 id="loginForm"
@@ -243,7 +257,7 @@
                 hidden
             ></p>
 
-            <p class="demo-hint">
+            <p class="demo-hint demo-credentials">
                 <strong>Demo:</strong>
                 demo.student@aun.edu.ng / Demo123!
             </p>
@@ -257,19 +271,14 @@
 
     </div>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        Built by <strong>chomkaTECH™</strong>
+    </footer>
+
     <!-- Application Scripts -->
     <script src="js/localStore.js"></script>
     <script src="js/auth-standalone.js"></script>
-
-    <!-- Footer -->
-    <div
-        style="text-align:center;margin-top:24px;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.3px;"
-    >
-        Built by
-        <strong style="color:rgba(255,255,255,.8);">
-            chomkaTECH™
-        </strong>
-    </div>
 
 </body>
 </html>

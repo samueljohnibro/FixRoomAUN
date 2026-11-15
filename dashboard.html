@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060b14">
+    <meta name="color-scheme" content="dark">
     <title>FixRoomAUN Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/png" href="assets/fixroomaunlogo.png">
 </head>
@@ -26,7 +31,7 @@
 
     <div class="header-right">
 
-        <div class="user-info-container">
+        <div class="user-info-container" tabindex="0">
             <span id="studentEmail"></span>
 
             <div class="user-popup">
@@ -114,7 +119,7 @@
         </div>
     </div>
 
-    <hr style="margin:60px 0; opacity:0.2;">
+    <hr class="section-divider">
 
     <h2>My Tickets</h2>
     <div id="ticketList" class="ticket-list"></div>
