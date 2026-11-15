@@ -63,10 +63,11 @@ html {
 
 body {
     position: relative;
+    isolation: isolate;
     min-height: 100vh;
     margin: 0;
     font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--bg-base);
+    background: transparent;
     color: var(--text-primary);
     line-height: 1.55;
     overflow-x: hidden;
@@ -82,11 +83,11 @@ body::before {
     z-index: -2;
     pointer-events: none;
     background:
-        radial-gradient(ellipse 75% 58% at 12% -6%, rgba(37, 99, 235, 0.24) 0%, transparent 64%),
-        radial-gradient(ellipse 65% 52% at 88% 8%, rgba(16, 185, 129, 0.17) 0%, transparent 60%),
-        radial-gradient(ellipse 72% 55% at 82% 96%, rgba(14, 116, 144, 0.21) 0%, transparent 64%),
-        radial-gradient(ellipse 60% 50% at 14% 88%, rgba(30, 58, 138, 0.19) 0%, transparent 64%),
-        linear-gradient(145deg, #040912 0%, #091527 32%, #0c1f35 64%, #071926 100%);
+        radial-gradient(ellipse 75% 58% at 12% -6%, rgba(37, 99, 235, 0.11) 0%, transparent 62%),
+        radial-gradient(ellipse 65% 52% at 88% 8%, rgba(16, 185, 129, 0.08) 0%, transparent 58%),
+        radial-gradient(ellipse 72% 55% at 82% 96%, rgba(14, 116, 144, 0.10) 0%, transparent 62%),
+        radial-gradient(ellipse 60% 50% at 14% 88%, rgba(30, 58, 138, 0.09) 0%, transparent 62%),
+        linear-gradient(145deg, #02050b 0%, #050b16 34%, #071220 66%, #030912 100%);
 }
 
 /* Subtle top specular atmosphere */
@@ -96,7 +97,7 @@ body::after {
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 0%, rgba(125, 211, 252, 0.055), transparent 55%);
+    background: radial-gradient(circle at 50% 0%, rgba(125, 211, 252, 0.025), transparent 55%);
 }
 
 ::selection {
