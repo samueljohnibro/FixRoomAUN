@@ -10,6 +10,8 @@
     const {
         getCurrentUser,
         isExplicitlyLoggedOut,
+        mountAccountSwitcher,
+        routeByRole,
         logout,
         getAllTickets,
         updateTicket
@@ -39,6 +41,7 @@
         staffEmail.textContent = user.email;
         staffEmail.title = user.email;
     }
+    mountAccountSwitcher?.("accountSwitcher");
 
     logoutBtn?.addEventListener("click", event => {
         event.preventDefault();
@@ -50,8 +53,13 @@
     });
 
     window.addEventListener("pageshow", () => {
-        if (isExplicitlyLoggedOut?.() || !getCurrentUser()) {
+        const current = getCurrentUser();
+        if (isExplicitlyLoggedOut?.() || !current) {
             routeToLogin();
+            return;
+        }
+        if (!["maintenance_staff", "maintenance_head", "overall_admin"].includes(current.role)) {
+            window.location.replace(routeByRole?.(current.role) || "dashboard.html");
             return;
         }
         loadTickets();

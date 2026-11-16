@@ -12,6 +12,8 @@
         getCurrentUser,
         startWithDemoStudent,
         isExplicitlyLoggedOut,
+        mountAccountSwitcher,
+        routeByRole,
         logout,
         getHousing,
         getStudentProfile,
@@ -102,6 +104,7 @@
         studentEmailSpan.textContent = user.email;
         studentEmailSpan.title = "Open profile details";
     }
+    mountAccountSwitcher?.("accountSwitcher");
 
     function loadHousing() {
         const profile = getStudentProfile(user.email);
@@ -131,8 +134,13 @@
     });
 
     window.addEventListener("pageshow", () => {
-        if (isExplicitlyLoggedOut?.() || !getCurrentUser()) {
+        const current = getCurrentUser();
+        if (isExplicitlyLoggedOut?.() || !current) {
             routeToLogin();
+            return;
+        }
+        if (current.role !== "student") {
+            window.location.replace(routeByRole?.(current.role) || "staff.html");
             return;
         }
         loadTickets();

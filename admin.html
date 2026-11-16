@@ -27,7 +27,13 @@
         <a class="nav-tab active" href="admin.html" aria-current="page">Admin</a>
     </nav>
 
-    <div class="header-right"><span id="analyticsEmail"></span><button id="logoutBtn" class="secondary-btn" type="button">Logout</button></div>
+    <div class="header-right">
+        <div class="header-account-group">
+            <span id="analyticsEmail"></span>
+            <div id="accountSwitcher" class="account-switch-container"></div>
+        </div>
+        <button id="logoutBtn" class="secondary-btn" type="button">Logout</button>
+    </div>
 </header>
 <main class="dashboard-container analytics-page">
     <div class="page-heading"><div><span class="eyebrow">System Administration</span><h1>Administrator Dashboard</h1><p>High-level view of maintenance operations for the demo organization.</p></div><button id="resetDemoBtn" class="secondary-btn" type="button">Reset Demo Data</button></div>

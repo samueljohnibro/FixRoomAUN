@@ -923,10 +923,152 @@ function resetDemoData() {
     const previousSession = demoStorage.get(SESSION_KEY);
     demoStorage.remove(STORAGE_KEY);
     const freshState = readState();
-    if (previousSession) {
+    if (previousSession && freshState.users.some(user => user.email === previousSession)) {
         demoStorage.set(SESSION_KEY, previousSession);
+    } else if (!isExplicitlyLoggedOut()) {
+        demoStorage.set(SESSION_KEY, "demo.student@aun.edu.ng");
     }
     return freshState;
+}
+
+function routeByRole(role) {
+    switch (role) {
+        case "student":
+            return "dashboard.html";
+        case "maintenance_staff":
+            return "staff.html";
+        case "maintenance_head":
+        case "overall_admin":
+            return "admin.html";
+        default:
+            return "dashboard.html";
+    }
+}
+
+function switchDemoAccount(targetAccountType = null) {
+    const current = getCurrentUser();
+    const currentlyStaff = current ? isStaffRole(current.role) : false;
+    const normalizedTarget =
+        targetAccountType === "student" || targetAccountType === "staff"
+            ? targetAccountType
+            : (currentlyStaff ? "student" : "staff");
+
+    const targetEmail =
+        normalizedTarget === "staff" ? "demo.staff@aun.edu.ng" : "demo.student@aun.edu.ng";
+    const targetAccount = getUserByEmail(targetEmail);
+    const password = targetAccount?.password || "Demo123!";
+
+    const result = login(targetEmail, password, normalizedTarget);
+    if (result.error || !result.user) {
+        return {
+            user: null,
+            error: result.error || "Unable to switch demo account.",
+            destination: "index.html?logged_out=1"
+        };
+    }
+
+    return {
+        user: result.user,
+        error: null,
+        destination: routeByRole(result.user.role)
+    };
+}
+
+function mountAccountSwitcher(target = "accountSwitcher") {
+    const container = typeof target === "string" ? document.getElementById(target) : target;
+    if (!container) return;
+
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        container.innerHTML = "";
+        return;
+    }
+
+    const currentlyStaff = isStaffRole(currentUser.role);
+    const nextType = currentlyStaff ? "student" : "staff";
+    const nextLabel = currentlyStaff ? "Demo Student" : "Demo Staff";
+    const nextEmail = currentlyStaff ? "demo.student@aun.edu.ng" : "demo.staff@aun.edu.ng";
+    const actionLabel = `Switch to ${nextLabel} (${nextEmail})`;
+    const isDemoStudentActive = currentUser.email === "demo.student@aun.edu.ng";
+    const isDemoStaffActive = currentUser.email === "demo.staff@aun.edu.ng";
+
+    container.innerHTML = `
+        <button
+            id="accountSwitchBtn"
+            class="account-switch-btn"
+            type="button"
+            aria-label="${actionLabel}"
+            title="${actionLabel}"
+            data-target-role="${nextType}"
+        >
+            <svg class="account-switch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8.2" r="3.6"></circle>
+                <path d="M5.2 19.2c0-3.3 3-5.8 6.8-5.8s6.8 2.5 6.8 5.8"></path>
+            </svg>
+            <span class="account-switch-badge" aria-hidden="true">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 5.5h9l-2.2-2.2"></path>
+                    <path d="M13 10.5H4l2.2 2.2"></path>
+                </svg>
+            </span>
+        </button>
+        <div class="account-switch-popup" role="region" aria-label="Switch demo account">
+            <p class="profile-heading">Switch Demo Account</p>
+            <button
+                type="button"
+                class="account-switch-option${isDemoStudentActive ? " is-active" : ""}"
+                data-switch-role="student"
+            >
+                <span class="account-switch-option-meta">
+                    <strong>Demo Student</strong>
+                    <small>demo.student@aun.edu.ng</small>
+                </span>
+                <span class="account-switch-pill">${isDemoStudentActive ? "Active" : "Switch →"}</span>
+            </button>
+            <button
+                type="button"
+                class="account-switch-option${isDemoStaffActive ? " is-active" : ""}"
+                data-switch-role="staff"
+            >
+                <span class="account-switch-option-meta">
+                    <strong>Demo Staff</strong>
+                    <small>demo.staff@aun.edu.ng</small>
+                </span>
+                <span class="account-switch-pill">${isDemoStaffActive ? "Active" : "Switch →"}</span>
+            </button>
+            <p class="profile-note">Click the profile icon to switch right away, or use Logout for the login screen.</p>
+        </div>
+    `;
+
+    const performSwitch = roleType => {
+        const result = switchDemoAccount(roleType);
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
+        window.location.replace(result.destination);
+    };
+
+    const mainBtn = container.querySelector("#accountSwitchBtn");
+    mainBtn?.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        performSwitch(nextType);
+    });
+
+    container.querySelectorAll(".account-switch-option").forEach(optionBtn => {
+        optionBtn.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            const chosenRole = optionBtn.dataset.switchRole;
+            const targetDestination = chosenRole === "staff" ? "staff.html" : "dashboard.html";
+            const currentPath = (window.location.pathname.split("/").pop() || "").toLowerCase();
+            if (optionBtn.classList.contains("is-active") && currentPath === targetDestination) {
+                return;
+            }
+            performSwitch(chosenRole);
+        });
+    });
 }
 
 // Expose the demo data layer for classic browser scripts.
@@ -938,6 +1080,9 @@ window.FixRoomStore = {
     startWithDemoStudent,
     isExplicitlyLoggedOut,
     isPinnedDemoAccount,
+    routeByRole,
+    switchDemoAccount,
+    mountAccountSwitcher,
     login,
     logout,
     signup,

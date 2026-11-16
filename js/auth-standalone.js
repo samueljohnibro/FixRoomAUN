@@ -18,25 +18,15 @@
         getCurrentUser,
         startWithDemoStudent,
         isPinnedDemoAccount,
+        routeByRole,
         login,
         getRecentAccounts,
         forgetRecentAccount,
         getUserByEmail
     } = store;
 
-    function routeByRole(role) {
-        switch (role) {
-            case "student":
-                return "dashboard.html";
-            case "maintenance_staff":
-                return "staff.html";
-            case "maintenance_head":
-            case "overall_admin":
-                return "admin.html";
-            default:
-                return "dashboard.html";
-        }
-    }
+    const getRouteForRole = role =>
+        routeByRole ? routeByRole(role) : (role === "student" ? "dashboard.html" : "staff.html");
 
     function showMessage(message, type = "error") {
         const element = document.getElementById("loginMessage");
@@ -89,7 +79,7 @@
                 showMessage(result.error);
                 return;
             }
-            window.location.replace(routeByRole(result.user.role));
+            window.location.replace(getRouteForRole(result.user.role));
         } else if (passwordField) {
             passwordField.focus();
             showMessage("Enter the password for this account once to enable quick sign-in.");
@@ -149,7 +139,7 @@
 
         if (!explicitlyLoggedOut) {
             const demoStudent = startWithDemoStudent();
-            window.location.replace(routeByRole(demoStudent?.role || "student"));
+            window.location.replace(getRouteForRole(demoStudent?.role || "student"));
             return;
         }
 
@@ -202,14 +192,14 @@
                 return;
             }
 
-            window.location.replace(routeByRole(result.user.role));
+            window.location.replace(getRouteForRole(result.user.role));
         });
 
         renderRecentAccounts();
 
         const currentUser = getCurrentUser();
         if (currentUser && !explicitlyLoggedOut) {
-            window.location.replace(routeByRole(currentUser.role));
+            window.location.replace(getRouteForRole(currentUser.role));
         }
     }
 

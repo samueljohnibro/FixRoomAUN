@@ -224,7 +224,8 @@ Orbit is being treated as a separate product rather than simply renaming FixRoom
 ### Latest demo behavior
 
 - The demo site starts directly on the already signed-in **Demo Student** dashboard (`demo.student@aun.edu.ng`) so visitors can explore immediately.
-- Clicking **Logout** opens the login page, where the **Previously logged in accounts** section always includes both primary demo accounts (`demo.student@aun.edu.ng` — Student, and `demo.staff@aun.edu.ng` — Staff) for instant one-click switching.
+- A profile switcher icon button beside the signed-in email in the dashboard header lets visitors switch directly in one click between the **Demo Student** (`demo.student@aun.edu.ng`) and **Demo Staff** (`demo.staff@aun.edu.ng`) dashboards without logging out first.
+- Clicking **Logout** remains available to open the login page, where the **Previously logged in accounts** section always includes both primary demo accounts (`demo.student@aun.edu.ng` — Student, and `demo.staff@aun.edu.ng` — Staff) for instant one-click switching.
 - Student accounts are automatically seeded once per browser account with a random set of realistic repair requests that persist in that browser's local storage and are immediately visible and actionable from the staff dashboard.
 - Every staff completion resets the student's feedback cycle, so thumbs up/down appear again after each completion.
 - Negative feedback starts from the current ticket description and remains editable before the request is reopened.

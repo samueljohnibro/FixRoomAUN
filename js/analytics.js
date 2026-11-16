@@ -10,6 +10,7 @@
     const {
         getCurrentUser,
         isExplicitlyLoggedOut,
+        mountAccountSwitcher,
         getAnalyticsForUser,
         resetDemoData,
         logout
@@ -35,6 +36,7 @@
         email.textContent = user.email;
         email.title = user.email;
     }
+    mountAccountSwitcher?.("accountSwitcher");
 
     const roleLabel = document.getElementById("analyticsRoleLabel");
     if (roleLabel) roleLabel.textContent = isStaff ? "Maintenance Operations" : "Personal Maintenance Activity";
@@ -153,8 +155,13 @@
 
     render();
     window.addEventListener("pageshow", () => {
-        if (isExplicitlyLoggedOut?.() || !getCurrentUser()) {
+        const active = getCurrentUser?.();
+        if (isExplicitlyLoggedOut?.() || !active) {
             routeToLogin();
+            return;
+        }
+        if (active.email !== user.email) {
+            window.location.reload();
             return;
         }
         render();
